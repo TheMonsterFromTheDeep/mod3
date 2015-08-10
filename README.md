@@ -1,2 +1,2 @@
 ## DEV
-The dev branch of this project will contain all the files that are not currently being developed but are not being worked on and are not finished enough to push to master.
+The dev branch of this project will contain files that are being developed - files in the master branch should be the newest files that are debugged and useable.
