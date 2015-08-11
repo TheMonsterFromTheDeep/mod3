@@ -98,6 +98,36 @@ namespace mod3
 		void operator+=(const char* c) { concat(c); } //Operators for convenience
 		string operator+(const char* c) { string r(*this); r.concat(c); return r; }
 
+		bool equals(string s)
+		{
+			if(_length == s._length)
+			{
+				for(int i = 0; i < _length; i++)
+				{
+					if(*(_data + i) != *(s._data + i)) { return false; }
+				}
+				return true;
+			}
+			return false;
+		}
+		bool operator==(string s) { return equals(s); }
+
+		bool equals(const char* c)
+		{
+			int c_length = 0;
+			while(*(c + c_length) != '\0') { c_length++; }
+			if(_length == c_length)
+			{
+				for(int i = 0; i < _length; i++)
+				{
+					if(*(_data + i) != *(c + i)) { return false; }
+				}
+				return true;
+			}
+			return false;
+		}
+		bool operator==(const char* c) { return equals(c); }
+
 		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with
 
 		char* get_data() //Return a copy of the pointer with the data
