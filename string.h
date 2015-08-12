@@ -3,6 +3,8 @@
 #ifndef __INCL_STRING
 #define __INCL_STRING
 
+#include "exception.h"
+
 namespace mod3
 {
 	class string
@@ -55,19 +57,19 @@ namespace mod3
 
 		void concat(string s) //Concatenate with another string
 		{
-			char* tmp = new char[_length + s._length];
+			char* tmp = _data;
+			_data = new char[_length + s._length + 1];
 			for(int i = 0; i < _length; i++)
 			{
-				*(tmp + i) = *(_data + i);
+				*(_data + i) = *(tmp + i);
 			}
 			for(int i = 0; i < s._length; i++)
 			{
-				*(tmp + _length + i) = *(s._data + i);
+				*(_data + _length + i) = *(s._data + i);
 			}
-			*(tmp + _length + s._length) = '\0';
+			*(_data + _length + s._length) = '\0';
 
-			delete[] _data;
-			_data = tmp;
+			delete[] tmp;
 
 			_length += s._length;
 		}
@@ -79,19 +81,19 @@ namespace mod3
 			int c_length = 0;
 			while(*(c + c_length) != '\0') { c_length++; }
 
-			char* tmp = new char[_length + c_length];
+			char* tmp = _data;
+			_data = new char[_length + c_length + 1];
 			for(int i = 0; i < _length; i++)
 			{
-				*(tmp + i) = *(_data + i);
+				*(_data + i) = *(tmp + i);
 			}
 			for(int i = 0; i < c_length; i++)
 			{
-				*(tmp + _length + i) = *(c + i);
+				*(_data + _length + i) = *(c + i);
 			}
-			*(tmp + _length + c_length) = '\0';
+			*(_data + _length + c_length) = '\0';
 
-			delete[] _data;
-			_data = tmp;
+			delete[] tmp;
 
 			_length += c_length;
 		}
@@ -129,6 +131,18 @@ namespace mod3
 		bool operator==(const char* c) { return equals(c); }
 
 		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with
+
+		char char_at(int index)
+		{
+			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			else { return *(_data + index); }
+		}
+
+		char& operator[] (int index)
+		{
+			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			else { return *(_data + index); }
+		}
 
 		char* get_data() //Return a copy of the pointer with the data
 		{
