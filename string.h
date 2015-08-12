@@ -49,6 +49,14 @@ namespace mod3
 			*(_data + _length) = '\0'; //Add null terminator
 		}
 
+		string(char c) //Construct string from single char
+		{
+			_length = 1;
+			_data = new char[2];
+			*_data = c;
+			*(_data + 1) = '\0';
+		}
+
 		string(string& s)
 		{
 			_data = s.get_data(); //Copy data over
@@ -99,6 +107,24 @@ namespace mod3
 		}
 		void operator+=(const char* c) { concat(c); } //Operators for convenience
 		string operator+(const char* c) { string r(*this); r.concat(c); return r; }
+
+		void concat(char c)
+		{
+			char* tmp = _data;
+			_data = new char[_length + 2]; //Enough room for the new char and the null terminator
+			for(int i = 0; i < _length; i++)
+			{
+				*(_data + i) = *(tmp + i);
+			}
+			*(_data + _length) = c;
+			*(_data + _length + 1) = '\0';
+
+			delete[] tmp;
+
+			_length += 1;
+		}
+		void operator+=(char c) { concat(c); }
+		string operator+(char c) { string r(*this); r.concat(c); return r; }
 
 		bool equals(string s)
 		{
