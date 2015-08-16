@@ -59,7 +59,7 @@ namespace mod3
 
 		string(string& s)
 		{
-			_data = s.get_data(); //Copy data over
+			_data = s.getData(); //Copy data over
 			_length = s._length;
 		}
 
@@ -126,6 +126,81 @@ namespace mod3
 		void operator+=(char c) { concat(c); }
 		string operator+(char c) { string r(*this); r.concat(c); return r; }
 
+		void insert(char c, int index)
+		{
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			else
+			{
+				char* tmp = _data;
+				_data = new char[_length + 2];
+				for(int i = 0; i < index; i++)
+				{
+					*(_data + i) = *(tmp + i);
+				}
+				*(_data + index) = c;
+				for(int i = index; i < _length; i++)
+				{
+					*(_data + i + 1) = *(tmp + i);
+				}
+				*(_data + _length + 1) = '\0';
+				_length++;
+				delete[] tmp;
+			}
+		}
+
+		void insert(const char* c, int index)
+		{
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			else
+			{
+				int c_length = 0;
+				while(*(c + c_length) != '\0') { c_length++; }
+
+				char* tmp = _data;
+				_data = new char[_length + c_length + 1];
+				for(int i = 0; i < index; i++)
+				{
+					*(_data + i) = *(tmp + i);
+				}
+				for(int i = 0; i < c_length; i++)
+				{
+					*(_data + index + i) = *(c + i);
+				}
+				for(int i = index; i < _length; i++)
+				{
+					*(_data + i + c_length) = *(tmp + i);
+				}
+				*(_data + _length + c_length) = '\0';
+				_length += c_length;
+				delete[] tmp;
+			}
+		}
+
+		void insert(string s, int index)
+		{
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			else
+			{
+				char* tmp = _data;
+				_data = new char[_length + s._length + 1];
+				for(int i = 0; i < index; i++)
+				{
+					*(_data + i) = *(tmp + i);
+				}
+				for(int i = 0; i < s._length; i++)
+				{
+					*(_data + index + i) = *(s._data + i);
+				}
+				for(int i = index; i < _length; i++)
+				{
+					*(_data + i + s._length) = *(tmp + i);
+				}
+				*(_data + _length + s._length) = '\0';
+				_length += s._length;
+				delete[] tmp;
+			}
+		}
+
 		bool equals(string s)
 		{
 			if(_length == s._length)
@@ -158,7 +233,7 @@ namespace mod3
 
 		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with
 
-		char char_at(int index)
+		char charAt(int index)
 		{
 			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
 			else { return *(_data + index); }
@@ -170,7 +245,7 @@ namespace mod3
 			else { return *(_data + index); }
 		}
 
-		char* get_data() //Return a copy of the pointer with the data
+		char* getData() //Return a copy of the pointer with the data
 		{
 			char* tmp = new char[_length + 1];
 			for(int i = 0; i <= _length; i++) //Copy data over including null terminator
