@@ -61,28 +61,23 @@ namespace mod3
 		{
 			_data = s.getData(); //Copy data over
 			_length = s._length;
-		}
+		}	
 
-		void concat(string s) //Concatenate with another string
+		void concat(char c)
 		{
 			char* tmp = _data;
-			_data = new char[_length + s._length + 1];
+			_data = new char[_length + 2]; //Enough room for the new char and the null terminator
 			for(int i = 0; i < _length; i++)
 			{
 				*(_data + i) = *(tmp + i);
 			}
-			for(int i = 0; i < s._length; i++)
-			{
-				*(_data + _length + i) = *(s._data + i);
-			}
-			*(_data + _length + s._length) = '\0';
+			*(_data + _length) = c;
+			*(_data + _length + 1) = '\0';
 
 			delete[] tmp;
 
-			_length += s._length;
+			_length += 1;
 		}
-		void operator+=(string s) { concat(s); } //Operators for convenience
-		string operator+(string s) { string r(*this); r.concat(s); return r; }
 
 		void concat(const char* c) //Concatenate with a const char* 
 		{
@@ -105,30 +100,29 @@ namespace mod3
 
 			_length += c_length;
 		}
-		void operator+=(const char* c) { concat(c); } //Operators for convenience
-		string operator+(const char* c) { string r(*this); r.concat(c); return r; }
-
-		void concat(char c)
+		
+		void concat(string s) //Concatenate with another string
 		{
 			char* tmp = _data;
-			_data = new char[_length + 2]; //Enough room for the new char and the null terminator
+			_data = new char[_length + s._length + 1];
 			for(int i = 0; i < _length; i++)
 			{
 				*(_data + i) = *(tmp + i);
 			}
-			*(_data + _length) = c;
-			*(_data + _length + 1) = '\0';
+			for(int i = 0; i < s._length; i++)
+			{
+				*(_data + _length + i) = *(s._data + i);
+			}
+			*(_data + _length + s._length) = '\0';
 
 			delete[] tmp;
 
-			_length += 1;
+			_length += s._length;
 		}
-		void operator+=(char c) { concat(c); }
-		string operator+(char c) { string r(*this); r.concat(c); return r; }
 
 		void insert(char c, int index)
 		{
-			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
 			else
 			{
 				char* tmp = _data;
@@ -150,7 +144,7 @@ namespace mod3
 
 		void insert(const char* c, int index)
 		{
-			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
 			else
 			{
 				int c_length = 0;
@@ -178,7 +172,7 @@ namespace mod3
 
 		void insert(string s, int index)
 		{
-			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
 			else
 			{
 				char* tmp = _data;
@@ -201,6 +195,10 @@ namespace mod3
 			}
 		}
 
+		void operator+=(char c) { concat(c); }
+		void operator+=(const char* c) { concat(c); }
+		void operator+=(string s) { concat(s); }
+		
 		bool equals(string s)
 		{
 			if(_length == s._length)
@@ -212,8 +210,7 @@ namespace mod3
 				return true;
 			}
 			return false;
-		}
-		bool operator==(string s) { return equals(s); }
+		}		
 
 		bool equals(const char* c)
 		{
@@ -229,19 +226,13 @@ namespace mod3
 			}
 			return false;
 		}
+
 		bool operator==(const char* c) { return equals(c); }
-
-		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with
-
-		char charAt(int index)
-		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
-			else { return *(_data + index); }
-		}
+		bool operator==(string s) { return equals(s); }
 
 		char& operator[] (int index)
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index >= _length) { throw new Exception("Index out of bounds in string"); }
 			else { return *(_data + index); }
 		}
 
@@ -254,6 +245,33 @@ namespace mod3
 			}
 			return tmp;
 		}
+
+		char charAt(int index)
+		{
+			if(index < 0 || index >= _length) { throw new Exception("Index out of bounds in string"); }
+			else { return *(_data + index); }
+		}
+		
+		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with
+		
+		string substr(int start, int end) 
+		{
+			if((start < 0 || start >= _length) || (end < 0 || end >= _length)) { throw new Exception("Index out of bounds in string"); }
+			else 
+			{
+				char* tmp = new char[end - start + 1];
+				for(int i = start; i < end; i++)
+				{
+					*(tmp + i - start) = *(_data + i);
+				}
+				*(tmp + end - start) = '\0';
+				return tmp;
+			}
+		}
+
+		string operator+(string s) { string r(*this); r.concat(s); return r; }		
+		string operator+(const char* c) { string r(*this); r.concat(c); return r; }		
+		string operator+(char c) { string r(*this); r.concat(c); return r; }		
 	};
 };
 
