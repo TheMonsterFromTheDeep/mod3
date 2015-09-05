@@ -13,6 +13,7 @@ namespace mod3
 		char* _data; //Stores the value of the string - not const because it needs to be able to be manipulated
 		int _length; //Stores the length of the string	
 	public:
+
 		string() //Default constructor
 		{
 			_data = '\0'; //The string simply consists of a null terminator
@@ -193,6 +194,20 @@ namespace mod3
 				_length += s._length;
 				delete[] tmp;
 			}
+		}
+
+		void replace(char find, char replace) 
+		{
+			for(int i = 0; i < _length; i++)
+			{
+				if(*(_data + i) == find) { *(_data + i) = replace; }
+			}
+		}
+
+		void replace(int index, char c)
+		{
+			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
+			else { *(_data + index) = c; }
 		}
 
 		void operator+=(char c) { concat(c); }
