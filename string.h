@@ -279,16 +279,16 @@ namespace mod3
 		string operator+(char c) { string r(*this); r.concatenate(c); return r; }		
 	};
 
-	char* getSubstring(string s, int start, int end) //Returns char* so redundant conversion to string doesn't happen when char* wanted
+	char* getSubstring(string base, int start, int end) //Returns char* so redundant conversion to string doesn't happen when char* wanted
 	{
-		if((start < 0 || start >= s.length()) || (end < 0 || end >= s.length())) { throw new exception("Index out of bounds in string"); }
+		if((start < 0 || start >= base.length()) || (end < 0 || end >= base.length())) { throw new exception("Index out of bounds in string"); }
 		else 
 		{
 			char* tmp = new char[end - start + 1];
-			char* base = s.text();
+			char* text = base.text();
 			for(int i = start; i < end; i++)
 			{
-				*(tmp + i - start) = *(base + i);
+				*(tmp + i - start) = *(text + i);
 			}
 			*(tmp + end - start) = '\0';
 			return tmp;
