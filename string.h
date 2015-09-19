@@ -10,13 +10,13 @@ namespace mod3
 	class string
 	{
 	private:
-		char* _data; //Stores the value of the string - not const because it needs to be able to be manipulated
+		char* _text; //Stores the value of the string - not const because it needs to be able to be manipulated
 		int _length; //Stores the length of the string	
 	public:
 
 		string() //Default constructor
 		{
-			_data = '\0'; //The string simply consists of a null terminator
+			_text = '\0'; //The string simply consists of a null terminator
 			_length = 0; //The useable length of the string is zero
 		}
 
@@ -27,12 +27,12 @@ namespace mod3
 			{
 				_length++;
 			}
-			_data = new char[_length + 1];
+			_text = new char[_length + 1];
 			for(int i = 0; i < _length; i++)
 			{
-				*(_data + i) = *(value + i);
+				*(_text + i) = *(value + i);
 			}
-			*(_data + _length) = '\0';
+			*(_text + _length) = '\0';
 		}
 
 		string(const char* value) //Initializing from a const char* requires copying the data over
@@ -42,79 +42,79 @@ namespace mod3
 			{
 				_length++;
 			}
-			_data = new char[_length + 1];
+			_text = new char[_length + 1];
 			for(int i = 0; i < _length; i++)
 			{
-				*(_data + i) = *(value + i);
+				*(_text + i) = *(value + i);
 			}
-			*(_data + _length) = '\0'; //Add null terminator
+			*(_text + _length) = '\0'; //Add null terminator
 		}
 
 		string(char c) //Construct string from single char
 		{
 			_length = 1;
-			_data = new char[2];
-			*_data = c;
-			*(_data + 1) = '\0';
+			_text = new char[2];
+			*_text = c;
+			*(_text + 1) = '\0';
 		}
 
 		string(string& s)
 		{
-			_data = s.getData(); //Copy data over
+			_text = s.copy(); //Copy data over
 			_length = s._length;
 		}	
 
-		void concat(char c)
+		void concatenate(char c)
 		{
-			char* tmp = _data;
-			_data = new char[_length + 2]; //Enough room for the new char and the null terminator
+			char* tmp = _text;
+			_text = new char[_length + 2]; //Enough room for the new char and the null terminator
 			for(int i = 0; i < _length; i++)
 			{
-				*(_data + i) = *(tmp + i);
+				*(_text + i) = *(tmp + i);
 			}
-			*(_data + _length) = c;
-			*(_data + _length + 1) = '\0';
+			*(_text + _length) = c;
+			*(_text + _length + 1) = '\0';
 
 			delete[] tmp;
 
 			_length += 1;
 		}
 
-		void concat(const char* c) //Concatenate with a const char* 
+		void concatenate(const char* c) //Concatenate with a const char* 
 		{
 			int c_length = 0;
 			while(*(c + c_length) != '\0') { c_length++; }
 
-			char* tmp = _data;
-			_data = new char[_length + c_length + 1];
+			char* tmp = _text;
+			_text = new char[_length + c_length + 1];
 			for(int i = 0; i < _length; i++)
 			{
-				*(_data + i) = *(tmp + i);
+				*(_text + i) = *(tmp + i);
 			}
 			for(int i = 0; i < c_length; i++)
 			{
-				*(_data + _length + i) = *(c + i);
+				*(_text + _length + i) = *(c + i);
 			}
-			*(_data + _length + c_length) = '\0';
+			*(_text + _length + c_length) = '\0';
 
 			delete[] tmp;
 
 			_length += c_length;
 		}
 		
-		void concat(string s) //Concatenate with another string
+		void concatenate(string s) //Concatenate with another string
 		{
-			char* tmp = _data;
-			_data = new char[_length + s._length + 1];
+			char* tmp = _text;
+			_text = new char[_length + s._length + 1];
 			for(int i = 0; i < _length; i++)
 			{
-				*(_data + i) = *(tmp + i);
+				*(_text + i) = *(tmp + i);
 			}
 			for(int i = 0; i < s._length; i++)
 			{
-				*(_data + _length + i) = *(s._data + i);
+				*(_text + _length + i) = *(s._text + i);
 			}
-			*(_data + _length + s._length) = '\0';
+			*(_text + _length + s._length) = '\0';
 
 			delete[] tmp;
 
@@ -123,21 +123,21 @@ namespace mod3
 
 		void insert(char c, int index)
 		{
-			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
 			else
 			{
-				char* tmp = _data;
-				_data = new char[_length + 2];
+				char* tmp = _text;
+				_text = new char[_length + 2];
 				for(int i = 0; i < index; i++)
 				{
-					*(_data + i) = *(tmp + i);
+					*(_text + i) = *(tmp + i);
 				}
-				*(_data + index) = c;
+				*(_text + index) = c;
 				for(int i = index; i < _length; i++)
 				{
-					*(_data + i + 1) = *(tmp + i);
+					*(_text + i + 1) = *(tmp + i);
 				}
-				*(_data + _length + 1) = '\0';
+				*(_text + _length + 1) = '\0';
 				_length++;
 				delete[] tmp;
 			}
@@ -145,27 +145,27 @@ namespace mod3
 
 		void insert(const char* c, int index)
 		{
-			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
 			else
 			{
 				int c_length = 0;
 				while(*(c + c_length) != '\0') { c_length++; }
 
-				char* tmp = _data;
-				_data = new char[_length + c_length + 1];
+				char* tmp = _text;
+				_text = new char[_length + c_length + 1];
 				for(int i = 0; i < index; i++)
 				{
-					*(_data + i) = *(tmp + i);
+					*(_text + i) = *(tmp + i);
 				}
 				for(int i = 0; i < c_length; i++)
 				{
-					*(_data + index + i) = *(c + i);
+					*(_text + index + i) = *(c + i);
 				}
 				for(int i = index; i < _length; i++)
 				{
-					*(_data + i + c_length) = *(tmp + i);
+					*(_text + i + c_length) = *(tmp + i);
 				}
-				*(_data + _length + c_length) = '\0';
+				*(_text + _length + c_length) = '\0';
 				_length += c_length;
 				delete[] tmp;
 			}
@@ -173,24 +173,24 @@ namespace mod3
 
 		void insert(string s, int index)
 		{
-			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
 			else
 			{
-				char* tmp = _data;
-				_data = new char[_length + s._length + 1];
+				char* tmp = _text;
+				_text = new char[_length + s._length + 1];
 				for(int i = 0; i < index; i++)
 				{
-					*(_data + i) = *(tmp + i);
+					*(_text + i) = *(tmp + i);
 				}
 				for(int i = 0; i < s._length; i++)
 				{
-					*(_data + index + i) = *(s._data + i);
+					*(_text + index + i) = *(s._text + i);
 				}
 				for(int i = index; i < _length; i++)
 				{
-					*(_data + i + s._length) = *(tmp + i);
+					*(_text + i + s._length) = *(tmp + i);
 				}
-				*(_data + _length + s._length) = '\0';
+				*(_text + _length + s._length) = '\0';
 				_length += s._length;
 				delete[] tmp;
 			}
@@ -200,19 +200,19 @@ namespace mod3
 		{
 			for(int i = 0; i < _length; i++)
 			{
-				if(*(_data + i) == find) { *(_data + i) = replace; }
+				if(*(_text + i) == find) { *(_text + i) = replace; }
 			}
 		}
 
 		void replace(int index, char c)
 		{
-			if(index < 0 || index > _length) { throw new Exception("Index out of bounds in string"); }
-			else { *(_data + index) = c; }
+			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			else { *(_text + index) = c; }
 		}
 
-		void operator+=(char c) { concat(c); }
-		void operator+=(const char* c) { concat(c); }
-		void operator+=(string s) { concat(s); }
+		void operator+=(char c) { concatenate(c); }
+		void operator+=(const char* c) { concatenate(c); }
+		void operator+=(string s) { concatenate(s); }
 		
 		bool equals(string s)
 		{
@@ -220,7 +220,7 @@ namespace mod3
 			{
 				for(int i = 0; i < _length; i++)
 				{
-					if(*(_data + i) != *(s._data + i)) { return false; }
+					if(*(_text + i) != *(s._text + i)) { return false; }
 				}
 				return true;
 			}
@@ -235,7 +235,7 @@ namespace mod3
 			{
 				for(int i = 0; i < _length; i++)
 				{
-					if(*(_data + i) != *(c + i)) { return false; }
+					if(*(_text + i) != *(c + i)) { return false; }
 				}
 				return true;
 			}
@@ -247,47 +247,53 @@ namespace mod3
 
 		char& operator[] (int index)
 		{
-			if(index < 0 || index >= _length) { throw new Exception("Index out of bounds in string"); }
-			else { return *(_data + index); }
+			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			else { return *(_text + index); }
 		}
 
-		char* getData() //Return a copy of the pointer with the data
+		char* copy() //Return a copy of the pointer with the data
 		{
 			char* tmp = new char[_length + 1];
 			for(int i = 0; i <= _length; i++) //Copy data over including null terminator
 			{
-				*(tmp + i) = *(_data + i);
+				*(tmp + i) = *(_text + i);
 			}
 			return tmp;
 		}
 
-		char charAt(int index)
+		char* text() //Return the text pointer for whatever reason
 		{
-			if(index < 0 || index >= _length) { throw new Exception("Index out of bounds in string"); }
-			else { return *(_data + index); }
-		}
-		
-		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with
-		
-		string substr(int start, int end) 
-		{
-			if((start < 0 || start >= _length) || (end < 0 || end >= _length)) { throw new Exception("Index out of bounds in string"); }
-			else 
-			{
-				char* tmp = new char[end - start + 1];
-				for(int i = start; i < end; i++)
-				{
-					*(tmp + i - start) = *(_data + i);
-				}
-				*(tmp + end - start) = '\0';
-				return tmp;
-			}
+			return _text;
 		}
 
-		string operator+(string s) { string r(*this); r.concat(s); return r; }		
-		string operator+(const char* c) { string r(*this); r.concat(c); return r; }		
-		string operator+(char c) { string r(*this); r.concat(c); return r; }		
+		char at(int index)
+		{
+			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			else { return *(_text + index); }
+		}
+		
+		int length() { return _length; } //Returns the length - the length is a private variable so it isn't screwed with		
+
+		string operator+(string s) { string r(*this); r.concatenate(s); return r; }		
+		string operator+(const char* c) { string r(*this); r.concatenate(c); return r; }		
+		string operator+(char c) { string r(*this); r.concatenate(c); return r; }		
 	};
+
+	char* getSubstring(string s, int start, int end) //Returns char* so redundant conversion to string doesn't happen when char* wanted
+	{
+		if((start < 0 || start >= s.length()) || (end < 0 || end >= s.length())) { throw new exception("Index out of bounds in string"); }
+		else 
+		{
+			char* tmp = new char[end - start + 1];
+			char* base = s.text();
+			for(int i = start; i < end; i++)
+			{
+				*(tmp + i - start) = *(base + i);
+			}
+			*(tmp + end - start) = '\0';
+			return tmp;
+		}
+	}
 };
 
 #endif

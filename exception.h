@@ -5,10 +5,10 @@
 
 namespace mod3
 {
-	class Exception
+	class exception
 	{
 	public:
-		Exception(const char* msg) { }
+		exception(const char* msg) { }
 	};
 };
 
