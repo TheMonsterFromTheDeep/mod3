@@ -12,6 +12,8 @@ namespace mod3
 	private:
 		char* _text; //Stores the value of the string - not const because it needs to be able to be manipulated
 		int _length; //Stores the length of the string	
+
+		string(char* text, int length) { _text = text; _length = length; }
 	public:
 
 		string() //Default constructor
@@ -31,19 +33,19 @@ namespace mod3
 			*(_text + 1) = '\0';
 		}
 
-		string(string& s)
+		string(const string& s)
 		{
-			_text = s.copy(); //Copy data over
+			_text = s.copy()._text; //Copy data over
 			_length = s._length;
 		}	
 
 		void concatenate(char c);
 		void concatenate(const char* c); //Concatenate with a const char* 	
-		void concatenate(string s); //Concatenate with another string
+		void concatenate(const string& s); //Concatenate with another string
 
 		void insert(char c, int index);
 		void insert(const char* c, int index);
-		void insert(string s, int index);
+		void insert(const string& s, int index);
 
 		void replace(char find, char replace)
 		{
@@ -61,13 +63,13 @@ namespace mod3
 
 		void operator+=(char c) { concatenate(c); }
 		void operator+=(const char* c) { concatenate(c); }
-		void operator+=(string s) { concatenate(s); }
+		void operator+=(const string& s) { concatenate(s); }
 	
 		bool equals(const char* c) const;
-		bool equals(string s) const;
+		bool equals(const string& s) const;
 
 		bool operator==(const char* c) const { return equals(c); }
-		bool operator==(string s) const { return equals(s); }
+		bool operator==(const string& s) const { return equals(s); }
 
 		char& operator[] (int index) const
 		{
@@ -86,9 +88,9 @@ namespace mod3
 		
 		int length() const { return _length; } //Returns the length - the length is a private variable so it isn't screwed with		
 
-		string operator+(string s) { string r(*this); r.concatenate(s); return r; }		
-		string operator+(const char* c) { string r(*this); r.concatenate(c); return r; }		
-		string operator+(char c) { string r(*this); r.concatenate(c); return r; }		
+		string operator+(const string& s) const; //{ string r(*this); r.concatenate(s); return r; }		
+		string operator+(const char* c) const; //{ string r(*this); r.concatenate(c); return r; }		
+		string operator+(char c) const; //{ string r(*this); r.concatenate(c); return r; }		
 	} string;
 
 	string::string(char* value)
@@ -159,7 +161,7 @@ namespace mod3
 		_length += c_length;
 	}
 
-	void string::concatenate(string s)
+	void string::concatenate(const string& s)
 	{
 		char* tmp = _text;
 		_text = new char[_length + s._length + 1];
@@ -228,7 +230,7 @@ namespace mod3
 		}
 	}
 
-	void string::insert(string s, int index)
+	void string::insert(const string& s, int index)
 	{
 		if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
 		else
@@ -253,7 +255,7 @@ namespace mod3
 		}
 	}
 
-	bool string::equals(string s) const
+	bool string::equals(const string& s) const
 	{
 		if(_length == s._length)
 		{
@@ -283,13 +285,55 @@ namespace mod3
 
 	string string::copy() const
 	{
-		string tmp;
-		tmp._text = new char[_length + 1];
-		tmp._length = _length;
+		char* tmp;
+		tmp = new char[_length + 1];
+		
 		for(int i = 0; i <= _length; i++) //Copy data over including null terminator
 		{
-			*(tmp._text + i) = *(_text + i);
+			*(tmp + i) = *(_text + i);
 		}
+
+		return string(tmp,_length);
+	}
+
+	string string::operator+(const char* c) const
+	{
+		string tmp = copy();
+		int c_length = 0;
+		while(*(c + c_length) != '\0') { c_length++; }
+
+		tmp._length += c_length;
+		for(int i = 0; i < c_length; i++)
+		{
+			*(tmp._text + _length + i) = *(c + i);
+		}
+		*(tmp._text + _length + c_length) = '\0';
+
+		return tmp;
+	}
+
+	string string::operator+(const string& s) const
+	{		
+		string tmp = copy();
+
+		tmp._length += s._length;
+		for(int i = 0; i < s._length; i++)
+		{
+			*(tmp._text + _length + i) = *(s._text + i);
+		}
+		*(tmp._text + _length + s._length) = '\0';
+
+		return tmp;
+	}
+
+	string string::operator+(char c) const
+	{
+		string tmp = copy();
+
+		tmp._length++;
+		*(tmp._text + _length) = c; //THis string's length hasn't changed
+		*(tmp._text + _length + 1) = '\0';
+
 		return tmp;
 	}
 
