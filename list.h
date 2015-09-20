@@ -64,9 +64,6 @@ namespace mod3
 		}
 
 		template<class T>
-		list(int length, T value);
-
-		template<class T>
 		T get(int index)
 		{
 			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
@@ -93,18 +90,6 @@ namespace mod3
 		_data = static_cast<T*>(allocation);
 
 		for(int i = 0; i < length; i++) { *(_data + i) = value; } //Populate list with value
-
-		_length = length;
-	}
-
-	template<class T>
-	list<void>::list(int length, T value)
-	{
-		void* allocation = new void*[length];
-		T* tmp = static_cast<T*>(allocation);
-
-		for(int i = 0; i < length; i++) { *(tmp + i) = value; }
-		_data = tmp;
 
 		_length = length;
 	}
