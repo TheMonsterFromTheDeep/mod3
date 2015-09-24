@@ -7,8 +7,14 @@ namespace mod3
 {
 	class exception
 	{
+	private:
+		const char* _message;
 	public:
-		exception(const char* msg) { }
+		exception(const char* msg) { _message = msg; }
+
+		const char* message() {
+			return _message;
+		}
 	};
 };
 

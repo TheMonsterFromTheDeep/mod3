@@ -22,7 +22,8 @@ namespace mod3
 			_length = 0; //The useable length of the string is zero
 		}
 
-		string(char* value);
+		string(char* value); //By default, the pointer isn't copied
+		string(char* value, bool copy); //Use this method to copy data from pointer
 		string(const char* value); //Initializing from a const char* requires copying the data over
 
 		string(char c) //Construct string from single char
@@ -57,7 +58,7 @@ namespace mod3
 
 		void replace(int index, char c)
 		{
-			if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
 			else { *(_text + index) = c; }
 		}
 
@@ -73,7 +74,7 @@ namespace mod3
 
 		char& operator[] (int index) const
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index >= _length) { throw exception("Index out of bounds in string"); }
 			else { return *(_text + index); }
 		}
 
@@ -82,7 +83,7 @@ namespace mod3
 
 		char at(int index) const
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in string"); }
+			if(index < 0 || index >= _length) { throw exception("Index out of bounds in string"); }
 			else { return *(_text + index); }
 		}
 		
@@ -100,12 +101,28 @@ namespace mod3
 		{
 			_length++;
 		}
-		_text = new char[_length + 1];
-		for(int i = 0; i < _length; i++)
+		_text = value;
+	}
+
+	string::string(char* value, bool copy)
+	{
+		_length = 0;
+		while(*(value + _length) != '\0')
 		{
-			*(_text + i) = *(value + i);
+			_length++;
 		}
-		*(_text + _length) = '\0';
+		if(copy) {
+			
+			_text = new char[_length + 1];
+			for(int i = 0; i < _length; i++)
+			{
+				*(_text + i) = *(value + i);
+			}
+			*(_text + _length) = '\0';
+		}
+		else {
+			_text = value;
+		}
 	}
 
 	string::string(const char* value)
@@ -182,7 +199,7 @@ namespace mod3
 
 	void string::insert(char c, int index)
 	{
-		if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+		if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
 		else
 		{
 			char* tmp = _text;
@@ -204,7 +221,7 @@ namespace mod3
 
 	void string::insert(const char* c, int index)
 	{
-		if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+		if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
 		else
 		{
 			int c_length = 0;
@@ -232,7 +249,7 @@ namespace mod3
 
 	void string::insert(const string& s, int index)
 	{
-		if(index < 0 || index > _length) { throw new exception("Index out of bounds in string"); }
+		if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
 		else
 		{
 			char* tmp = _text;
@@ -331,7 +348,7 @@ namespace mod3
 		string tmp = copy();
 
 		tmp._length++;
-		*(tmp._text + _length) = c; //THis string's length hasn't changed
+		*(tmp._text + _length) = c; //This string's length hasn't changed
 		*(tmp._text + _length + 1) = '\0';
 
 		return tmp;

@@ -3,6 +3,7 @@
 #ifndef __INCL_LIST
 #define __INCL_LIST
 
+#include <new> //Used for bad_alloc errors
 #include "exception.h"
 
 namespace mod3 
@@ -36,6 +37,8 @@ namespace mod3
 			else { return *(_data + index); }
 		}
 
+		void add(T value);
+
 		void set(int index, T value)
 		{
 			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
@@ -43,6 +46,23 @@ namespace mod3
 		}
 
 	};
+
+	template<class T>
+	void list<T>::add(T value) {
+		T* tmp = _data;
+
+		void* allocation = new void*[_length + 1];
+		_data = static_cast<T*>(allocation);
+
+		for(int i = 0; i < _length; i++) //length still has old value
+		{
+			*(_data + i) = *(tmp + i);
+		}
+
+		*(_data + _length) = value; //Set new value at largest index of new array
+
+		_length++;
+	}
 
 	template<>
 	class list<void>
@@ -64,10 +84,17 @@ namespace mod3
 		}
 
 		template<class T>
-		T get(int index)
+		T& get(int index) 
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
-			else { return *(static_cast<T*>(_data) + index); }
+			if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
+			else {
+				try {
+					return *(static_cast<T*>(_data) + index);
+				}
+				catch (std::bad_alloc& err) {
+					throw exception("Error returning object."); //TODO: make exception messages better
+				}
+			}
 		}
 
 		template<class T>
