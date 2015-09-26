@@ -25,7 +25,7 @@ namespace mod3
 		list(int length);
 		list(int length, T value);
 
-		T get(int index)
+		T get(int index) const
 		{
 			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
 			else { return *(_data + index); }
@@ -39,6 +39,7 @@ namespace mod3
 
 		void add(T value);
 		void expand(int length);
+		void bubble(int index, int length);
 
 		void set(int index, T value)
 		{
@@ -46,6 +47,7 @@ namespace mod3
 			else { *(_data + index) = value; }
 		}
 
+		int length() const { return _length; }
 	};
 
 	template<class T>
@@ -72,12 +74,34 @@ namespace mod3
 	{
 		T* tmp = _data;
 
-		void* allocation = new void*[_length + 1];
+		void* allocation = new void*[_length + length];
 		_data = static_cast<T*>(allocation);
 
 		for(int i = 0; i < _length; i++)
 		{
 			*(_data + i) = *(tmp + i);
+		}
+
+		delete[] tmp;
+
+		_length += length;
+	}
+
+	template<class T>
+	void list<T>::bubble(int index, int length)
+	{
+		T* tmp = _data;
+
+		void* allocation = new void*[_length + length];
+		_data = static_cast<T*>(allocation);
+
+		for(int i = 0; i < index; i++)
+		{
+			*(_data + i) = *(tmp + i);
+		}
+		for(int i = index + length; i < _length + length; i++)
+		{
+			*(_data + i) = *(tmp + i - length);
 		}
 
 		delete[] tmp;
