@@ -38,10 +38,14 @@ namespace mod3
 		}
 
 		void add(T value);
-		void insert(T value, int index);
+		void insert(int index, T value);
 
 		void expand(int length);
-		void bubble(int length, int index);
+		void bubble(int index, int length);
+
+		void reset(int index);
+		void remove(int index);
+		void remove(int index, int length);
 
 		void set(int index, T value)
 		{
@@ -72,7 +76,7 @@ namespace mod3
 	}
 
 	template<class T>
-	void list<T>::insert(T value, int index) {
+	void list<T>::insert(int index, T value) {
 		T* tmp = _data;
 
 		void* allocation = new void*[_length + 1];
@@ -112,7 +116,7 @@ namespace mod3
 	}
 
 	template<class T>
-	void list<T>::bubble(int length, int index)
+	void list<T>::bubble(int index, int length)
 	{
 		T* tmp = _data;
 
@@ -131,6 +135,59 @@ namespace mod3
 		delete[] tmp;
 
 		_length += length;
+	}
+
+	template<class T>
+	void list<T>::reset(int index) 
+	{
+		void* resval = new void*[1];
+		T* defval = static_cast<T*>(resval);
+
+		*(_data + index) = *defval;
+	}
+
+	template<class T>
+	void list<T>::remove(int index)
+	{
+		T* tmp = _data;
+
+		void* allocation = new void*[_length - 1];
+		_data = static_cast<T*>(allocation);
+
+		for(int i = 0; i < index; i++)
+		{
+			*(_data + i) = *(tmp + i);
+		}
+		for(int i = index + 1; i < _length; i++)
+		{
+			*(_data + i - 1) = *(tmp + i);
+		}
+
+		delete[] tmp;
+
+		_length--;
+	}
+
+	template<class T>
+	void list<T>::remove(int index, int length)
+	{
+		T* tmp = _data;
+
+		void* allocation = new void*[_length - length];
+		_data = static_cast<T*>(allocation);
+
+		for(int i = 0; i < index; i++)
+		{
+			*(_data + i) = *(tmp + i);
+		}
+		for(int i = index + length; i < _length; i++)
+		{
+			*(_data + i - length) = *(tmp + i);
+		}
+
+		delete[] tmp;
+
+		_length -= length;
 	}
 
 	template<>
