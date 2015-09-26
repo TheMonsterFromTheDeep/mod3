@@ -38,8 +38,10 @@ namespace mod3
 		}
 
 		void add(T value);
+		void insert(T value, int index);
+
 		void expand(int length);
-		void bubble(int index, int length);
+		void bubble(int length, int index);
 
 		void set(int index, T value)
 		{
@@ -70,6 +72,28 @@ namespace mod3
 	}
 
 	template<class T>
+	void list<T>::insert(T value, int index) {
+		T* tmp = _data;
+
+		void* allocation = new void*[_length + 1];
+		_data = static_cast<T*>(allocation);
+
+		for(int i = 0; i < index; i++) //If index = 0 inserted element should be first
+		{
+			*(_data + i) = *(tmp + i);
+		}
+		*(_data + index) = value; //Insert the new value at the index
+		for(int i = index + 1; i < _length + 1; i++)
+		{
+			*(_data + i) = *(tmp + i - 1);
+		}
+
+		delete[] tmp;
+
+		_length++;
+	}
+
+	template<class T>
 	void list<T>::expand(int length)
 	{
 		T* tmp = _data;
@@ -88,7 +112,7 @@ namespace mod3
 	}
 
 	template<class T>
-	void list<T>::bubble(int index, int length)
+	void list<T>::bubble(int length, int index)
 	{
 		T* tmp = _data;
 
