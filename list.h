@@ -27,13 +27,13 @@ namespace mod3
 
 		T get(int index) const
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
+			if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
 			else { return *(_data + index); }
 		}
 
 		T& operator[] (int index) //Returns a reference so value can be modified
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
+			if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
 			else { return *(_data + index); }
 		}
 
@@ -49,7 +49,7 @@ namespace mod3
 
 		void set(int index, T value)
 		{
-			if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
+			if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
 			else { *(_data + index) = value; }
 		}
 
@@ -77,24 +77,28 @@ namespace mod3
 
 	template<class T>
 	void list<T>::insert(int index, T value) {
-		T* tmp = _data;
-
-		void* allocation = new void*[_length + 1];
-		_data = static_cast<T*>(allocation);
-
-		for(int i = 0; i < index; i++) //If index = 0 inserted element should be first
+		if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
+		else
 		{
-			*(_data + i) = *(tmp + i);
-		}
-		*(_data + index) = value; //Insert the new value at the index
-		for(int i = index + 1; i < _length + 1; i++)
-		{
-			*(_data + i) = *(tmp + i - 1);
-		}
+			T* tmp = _data;
 
-		delete[] tmp;
+			void* allocation = new void*[_length + 1];
+			_data = static_cast<T*>(allocation);
 
-		_length++;
+			for(int i = 0; i < index; i++) //If index = 0 inserted element should be first
+			{
+				*(_data + i) = *(tmp + i);
+			}
+			*(_data + index) = value; //Insert the new value at the index
+			for(int i = index + 1; i < _length + 1; i++)
+			{
+				*(_data + i) = *(tmp + i - 1);
+			}
+
+			delete[] tmp;
+
+			_length++;
+		}
 	}
 
 	template<class T>
@@ -118,76 +122,94 @@ namespace mod3
 	template<class T>
 	void list<T>::bubble(int index, int length)
 	{
-		T* tmp = _data;
-
-		void* allocation = new void*[_length + length];
-		_data = static_cast<T*>(allocation);
-
-		for(int i = 0; i < index; i++)
+		if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
+		else if(length < 1) { throw exception("Invalid length parameter"); }
+		else
 		{
-			*(_data + i) = *(tmp + i);
-		}
-		for(int i = index + length; i < _length + length; i++)
-		{
-			*(_data + i) = *(tmp + i - length);
-		}
+			T* tmp = _data;
 
-		delete[] tmp;
+			void* allocation = new void*[_length + length];
+			_data = static_cast<T*>(allocation);
 
-		_length += length;
+			for(int i = 0; i < index; i++)
+			{
+				*(_data + i) = *(tmp + i);
+			}
+			for(int i = index + length; i < _length + length; i++)
+			{
+				*(_data + i) = *(tmp + i - length);
+			}
+
+			delete[] tmp;
+
+			_length += length;
+		}
 	}
 
 	template<class T>
 	void list<T>::reset(int index) 
 	{
-		void* resval = new void*[1];
-		T* defval = static_cast<T*>(resval);
+		if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
+		else
+		{
+			void* resval = new void*[1];
+			T* defval = static_cast<T*>(resval);
 
-		*(_data + index) = *defval;
+			*(_data + index) = *defval;
+		}
 	}
 
 	template<class T>
 	void list<T>::remove(int index)
 	{
-		T* tmp = _data;
-
-		void* allocation = new void*[_length - 1];
-		_data = static_cast<T*>(allocation);
-
-		for(int i = 0; i < index; i++)
+		if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
+		else
 		{
-			*(_data + i) = *(tmp + i);
-		}
-		for(int i = index + 1; i < _length; i++)
-		{
-			*(_data + i - 1) = *(tmp + i);
-		}
+			T* tmp = _data;
 
-		delete[] tmp;
+			void* allocation = new void*[_length - 1];
+			_data = static_cast<T*>(allocation);
 
-		_length--;
+			for(int i = 0; i < index; i++)
+			{
+				*(_data + i) = *(tmp + i);
+			}
+			for(int i = index + 1; i < _length; i++)
+			{
+				*(_data + i - 1) = *(tmp + i);
+			}
+
+			delete[] tmp;
+
+			_length--;
+		}
 	}
 
 	template<class T>
 	void list<T>::remove(int index, int length)
 	{
-		T* tmp = _data;
-
-		void* allocation = new void*[_length - length];
-		_data = static_cast<T*>(allocation);
-
-		for(int i = 0; i < index; i++)
+		if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
+		else if(length < 1 || length > _length) { throw exception("Invalid length parameter"); }
+		else
 		{
-			*(_data + i) = *(tmp + i);
-		}
-		for(int i = index + length; i < _length; i++)
-		{
-			*(_data + i - length) = *(tmp + i);
-		}
+			T* tmp = _data;
 
-		delete[] tmp;
+			void* allocation = new void*[_length - length];
+			_data = static_cast<T*>(allocation);
 
-		_length -= length;
+			for(int i = 0; i < index; i++)
+			{
+				*(_data + i) = *(tmp + i);
+			}
+			for(int i = index + length; i < _length; i++)
+			{
+				*(_data + i - length) = *(tmp + i);
+			}
+
+			delete[] tmp;
+
+			_length -= length;
+		}
 	}
 
 	template<>
@@ -250,7 +272,7 @@ namespace mod3
 	template<class T>
 	void list<void>::set(int index, T value)
 	{
-		if(index < 0 || index >= _length) { throw new exception("Index out of bounds in list"); }
+		if(index < 0 || index >= _length) { throw exception("Index out of bounds in list"); }
 		else
 		{
 			T* tmp = static_cast<T*>(_data);
