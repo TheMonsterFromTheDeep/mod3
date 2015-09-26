@@ -38,6 +38,7 @@ namespace mod3
 		}
 
 		void add(T value);
+		void expand(int length);
 
 		void set(int index, T value)
 		{
@@ -59,9 +60,29 @@ namespace mod3
 			*(_data + i) = *(tmp + i);
 		}
 
+		delete[] tmp;
+
 		*(_data + _length) = value; //Set new value at largest index of new array
 
 		_length++;
+	}
+
+	template<class T>
+	void list<T>::expand(int length)
+	{
+		T* tmp = _data;
+
+		void* allocation = new void*[_length + 1];
+		_data = static_cast<T*>(allocation);
+
+		for(int i = 0; i < _length; i++)
+		{
+			*(_data + i) = *(tmp + i);
+		}
+
+		delete[] tmp;
+
+		_length += length;
 	}
 
 	template<>
