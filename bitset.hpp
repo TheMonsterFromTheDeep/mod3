@@ -1,17 +1,10 @@
-#pragma once
-
 #ifndef __INCL_BITSET
 #define __INCL_BITSET
 
-#include "byte.h"
-#include "exception.h"
+#include "memory.hpp"
+#include "exception.hpp"
 
 namespace mod3 {
-	typedef enum bit: mod3::byte {
-		ZERO = 0,
-		ONE = 1
-	} bit;
-
 	typedef class BitString {
 	private:
 		byte _value;
@@ -20,13 +13,8 @@ namespace mod3 {
 			_value = 0;
 		}
 
-		void push(bit b) {
-			_value <<= 1;
-			_value += b;
-		}
-
 		void set(int index, bit b) {
-			if(index < 0 || index >= 8) { throw mod3::exception("Index out of bounds in BitString"); }
+			if(index < 0 || index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
 			else {
 				if(b == ONE) {
 					_value |= (1 << index);
@@ -37,8 +25,8 @@ namespace mod3 {
 			}
 		}
 
-		bit get(int index) {
-			if(index < 0 || index >= 8) { throw mod3::exception("Index out of bounds in BitString"); }
+		bit get(int index) const {
+			if(index < 0 || index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
 			else {
 				return (((1 << index) & _value) == 0) ? ZERO : ONE;
 			}
@@ -47,21 +35,21 @@ namespace mod3 {
 
 	typedef class BitSet {
 	private:
-		byte* _data; //Stores the data - the length of this pointer is equal to _length % 8 + 1
-		int _length;
+		byte* _data; //Stores the data - the length of this pointer is equal to _length / 8 + 1
+		idx _length;
 	public:
 		BitSet() {
 			_length = 0;
 			_data = nullptr;
 		}
 
-		BitSet(int length) {
-			_data = new byte[(length / 8) + 1];
+		BitSet(idx length) {
+			_data = new byte[(length / memory::bytelength) + 1];
 			_length = length;
 		}
 
-		void set(int index, bit b) {
-			if(index < 0 || index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
+		void set(idx index, bit b) {
+			if(index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
 			else {
 				//This equation sets the bit at the right byte to the specified bit.
 				//First, the byte at _data + (index / 8) is accessed. This is the
@@ -70,18 +58,19 @@ namespace mod3 {
 				//shifted by the index modulo 8. The index is modulo'd 8 so that it has
 				//the proper remained from the index passed to the method.
 				if(b == ONE) {
-					*(_data + (index / 8)) |= (1 << (index % 8));
+					*(_data + (index / memory::bytelength)) |= (1 << (index % memory::bytelength));
 				}
 				else {
-					*(_data + (index / 8)) &= ~(0 << (index % 8));
+					*(_data + (index / memory::bytelength)) &= ~(0 << (index % memory::bytelength));
 				}
+
 			}
 		}
 
-		bit get(int index) {
-			if(index < 0 || index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
+		bit get(idx index) const {
+			if(index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
 			else {
-				return (((1 << index) & *(_data + (index / 8))) == 0) ? ZERO : ONE;
+				return (((1 << index) & *(_data + (index / memory::bytelength))) == 0) ? ZERO : ONE;
 			}
 		}
 	} BitSet;

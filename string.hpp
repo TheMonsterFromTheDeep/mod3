@@ -1,9 +1,8 @@
-#pragma once
-
 #ifndef __INCL_STRING
 #define __INCL_STRING
 
-#include "exception.h"
+#include "memory.hpp"
+#include "exception.hpp"
 
 namespace mod3
 {
@@ -11,9 +10,9 @@ namespace mod3
 	{
 	private:
 		char* _text; //Stores the value of the string - not const because it needs to be able to be manipulated
-		int _length; //Stores the length of the string	
+		idx _length; //Stores the length of the string	
 
-		string(char* text, int length) { _text = text; _length = length; }
+		string(char* text, idx length) { _text = text; _length = length; }
 	public:
 
 		string() //Default constructor
@@ -44,9 +43,9 @@ namespace mod3
 		void concatenate(const char* c); //Concatenate with a const char* 	
 		void concatenate(const string& s); //Concatenate with another string
 
-		void insert(char c, int index);
-		void insert(const char* c, int index);
-		void insert(const string& s, int index);
+		void insert(char c, idx index);
+		void insert(const char* c, idx index);
+		void insert(const string& s, idx index);
 
 		void replace(char find, char replace)
 		{
@@ -56,9 +55,9 @@ namespace mod3
 			}
 		}
 
-		void replace(int index, char c)
+		void replace(idx index, char c)
 		{
-			if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
+			if(index > _length) { throw exception("Index out of bounds in string"); }
 			else { *(_text + index) = c; }
 		}
 
@@ -72,26 +71,26 @@ namespace mod3
 		bool operator==(const char* c) const { return equals(c); }
 		bool operator==(const string& s) const { return equals(s); }
 
-		char& operator[] (int index) const
+		char& operator[] (idx index) const
 		{
-			if(index < 0 || index >= _length) { throw exception("Index out of bounds in string"); }
+			if(index >= _length) { throw exception("Index out of bounds in string"); }
 			else { return *(_text + index); }
 		}
 
 		string copy() const; //Return a copy of the pointer with the data
 		char* text() const { return _text; } //Return the text pointer for whatever reason
 
-		char at(int index) const
+		char at(idx index) const
 		{
-			if(index < 0 || index >= _length) { throw exception("Index out of bounds in string"); }
+			if(index >= _length) { throw exception("Index out of bounds in string"); }
 			else { return *(_text + index); }
 		}
 		
 		int length() const { return _length; } //Returns the length - the length is a private variable so it isn't screwed with		
 
-		string operator+(const string& s) const; //{ string r(*this); r.concatenate(s); return r; }		
-		string operator+(const char* c) const; //{ string r(*this); r.concatenate(c); return r; }		
-		string operator+(char c) const; //{ string r(*this); r.concatenate(c); return r; }		
+		string operator+(const string& s) const;	
+		string operator+(const char* c) const;
+		string operator+(char c) const;
 	} string;
 
 	string::string(char* value)
@@ -142,74 +141,83 @@ namespace mod3
 
 	void string::concatenate(char c)
 	{
-		char* tmp = _text;
-		_text = new char[_length + 2]; //Enough room for the new char and the null terminator
-		for(int i = 0; i < _length; i++)
-		{
-			*(_text + i) = *(tmp + i);
+		if(_length + 2 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+		else {
+			char* tmp = _text;
+			_text = new char[_length + 2]; //Enough room for the new char and the null terminator
+			for(idx i = 0; i < _length; i++)
+			{
+				*(_text + i) = *(tmp + i);
+			}
+			*(_text + _length) = c;
+			*(_text + _length + 1) = '\0';
+
+			delete[] tmp;
+
+			_length += 1;
 		}
-		*(_text + _length) = c;
-		*(_text + _length + 1) = '\0';
-
-		delete[] tmp;
-
-		_length += 1;
 	}
 
 	void string::concatenate(const char* c)
 	{
-		int c_length = 0;
+		idx c_length = 0;
 		while(*(c + c_length) != '\0') { c_length++; }
-
+		if(_length + c_length + 1 > _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+		else {
 		char* tmp = _text;
-		_text = new char[_length + c_length + 1];
-		for(int i = 0; i < _length; i++)
-		{
-			*(_text + i) = *(tmp + i);
-		}
-		for(int i = 0; i < c_length; i++)
-		{
-			*(_text + _length + i) = *(c + i);
-		}
-		*(_text + _length + c_length) = '\0';
+			_text = new char[_length + c_length + 1];
+			for(idx i = 0; i < _length; i++)
+			{
+				*(_text + i) = *(tmp + i);
+			}
+			for(idx i = 0; i < c_length; i++)
+			{
+				*(_text + _length + i) = *(c + i);
+			}
+			*(_text + _length + c_length) = '\0';
 
-		delete[] tmp;
+			delete[] tmp;
 
-		_length += c_length;
+			_length += c_length;
+		}
 	}
 
 	void string::concatenate(const string& s)
 	{
-		char* tmp = _text;
-		_text = new char[_length + s._length + 1];
-		for(int i = 0; i < _length; i++)
-		{
-			*(_text + i) = *(tmp + i);
-		}
-		for(int i = 0; i < s._length; i++)
-		{
-			*(_text + _length + i) = *(s._text + i);
-		}
-		*(_text + _length + s._length) = '\0';
+		if(_length + s._length + 1 > _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+		else {
+			char* tmp = _text;
+			_text = new char[_length + s._length + 1];
+			for(int i = 0; i < _length; i++)
+			{
+				*(_text + i) = *(tmp + i);
+			}
+			for(int i = 0; i < s._length; i++)
+			{
+				*(_text + _length + i) = *(s._text + i);
+			}
+			*(_text + _length + s._length) = '\0';
 
-		delete[] tmp;
+			delete[] tmp;
 
-		_length += s._length;
+			_length += s._length;
+		}
 	}
 
-	void string::insert(char c, int index)
+	void string::insert(char c, idx index)
 	{
-		if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
+		if(index > _length) { throw exception("Index out of bounds in string"); }
+		else if(_length + 2 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
 		else
 		{
 			char* tmp = _text;
 			_text = new char[_length + 2];
-			for(int i = 0; i < index; i++)
+			for(idx i = 0; i < index; i++)
 			{
 				*(_text + i) = *(tmp + i);
 			}
 			*(_text + index) = c;
-			for(int i = index; i < _length; i++)
+			for(idx i = index; i < _length; i++)
 			{
 				*(_text + i + 1) = *(tmp + i);
 			}
@@ -219,50 +227,54 @@ namespace mod3
 		}
 	}
 
-	void string::insert(const char* c, int index)
+	void string::insert(const char* c, idx index)
 	{
-		if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
+		if(index > _length) { throw exception("Index out of bounds in string"); }
 		else
 		{
-			int c_length = 0;
+			idx c_length = 0;
 			while(*(c + c_length) != '\0') { c_length++; }
 
-			char* tmp = _text;
-			_text = new char[_length + c_length + 1];
-			for(int i = 0; i < index; i++)
-			{
-				*(_text + i) = *(tmp + i);
+			if(_length + c_length + 1 > _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+			else {
+				char* tmp = _text;
+				_text = new char[_length + c_length + 1];
+				for(idx i = 0; i < index; i++)
+				{
+					*(_text + i) = *(tmp + i);
+				}
+				for(idx i = 0; i < c_length; i++)
+				{
+					*(_text + index + i) = *(c + i);
+				}
+				for(idx i = index; i < _length; i++)
+				{
+					*(_text + i + c_length) = *(tmp + i);
+				}
+				*(_text + _length + c_length) = '\0';
+				_length += c_length;
+				delete[] tmp;
 			}
-			for(int i = 0; i < c_length; i++)
-			{
-				*(_text + index + i) = *(c + i);
-			}
-			for(int i = index; i < _length; i++)
-			{
-				*(_text + i + c_length) = *(tmp + i);
-			}
-			*(_text + _length + c_length) = '\0';
-			_length += c_length;
-			delete[] tmp;
 		}
 	}
 
-	void string::insert(const string& s, int index)
+	void string::insert(const string& s, idx index)
 	{
-		if(index < 0 || index > _length) { throw exception("Index out of bounds in string"); }
+		if(index > _length) { throw exception("Index out of bounds in string"); }
+		else if(_length + s._length + 1 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
 		else
 		{
 			char* tmp = _text;
 			_text = new char[_length + s._length + 1];
-			for(int i = 0; i < index; i++)
+			for(idx i = 0; i < index; i++)
 			{
 				*(_text + i) = *(tmp + i);
 			}
-			for(int i = 0; i < s._length; i++)
+			for(idx i = 0; i < s._length; i++)
 			{
 				*(_text + index + i) = *(s._text + i);
 			}
-			for(int i = index; i < _length; i++)
+			for(idx i = index; i < _length; i++)
 			{
 				*(_text + i + s._length) = *(tmp + i);
 			}
@@ -305,7 +317,7 @@ namespace mod3
 		char* tmp;
 		tmp = new char[_length + 1];
 		
-		for(int i = 0; i <= _length; i++) //Copy data over including null terminator
+		for(idx i = 0; i <= _length; i++) //Copy data over including null terminator
 		{
 			*(tmp + i) = *(_text + i);
 		}
@@ -314,23 +326,28 @@ namespace mod3
 	}
 
 	string string::operator+(const char* c) const
-	{
-		string tmp = copy();
+	{	
 		int c_length = 0;
 		while(*(c + c_length) != '\0') { c_length++; }
 
-		tmp._length += c_length;
-		for(int i = 0; i < c_length; i++)
-		{
-			*(tmp._text + _length + i) = *(c + i);
-		}
-		*(tmp._text + _length + c_length) = '\0';
+		if(c_length + _length + 1 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+		else {
+			string tmp = copy();
 
-		return tmp;
+			tmp._length += c_length;
+			for(int i = 0; i < c_length; i++)
+			{
+				*(tmp._text + _length + i) = *(c + i);
+			}
+			*(tmp._text + _length + c_length) = '\0';
+
+			return tmp;
+		}
 	}
 
 	string string::operator+(const string& s) const
-	{		
+	{
+		if(_length + s._length + 1 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
 		string tmp = copy();
 
 		tmp._length += s._length;
@@ -345,13 +362,16 @@ namespace mod3
 
 	string string::operator+(char c) const
 	{
-		string tmp = copy();
+		if(_length + 2 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+		else {
+			string tmp = copy();
 
-		tmp._length++;
-		*(tmp._text + _length) = c; //This string's length hasn't changed
-		*(tmp._text + _length + 1) = '\0';
+			tmp._length++;
+			*(tmp._text + _length) = c; //This string's length hasn't changed
+			*(tmp._text + _length + 1) = '\0';
 
-		return tmp;
+			return tmp;
+		}
 	}
 
 	char* substring(const string& base, int start, int end) //Returns char* so redundant conversion to string doesn't happen when char* wanted

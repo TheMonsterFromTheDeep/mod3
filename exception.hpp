@@ -1,18 +1,17 @@
-#pragma once
-
 #ifndef __INCL_EXCEPTION
 #define __INCL_EXCEPTION
 
 namespace mod3
 {
-	class exception
-	{
+	class exception {
 	private:
-		const char* _message;
+		char* _message;
 	public:
-		exception(const char* msg) { _message = msg; }
+		exception(char* msg) { 
+			_message = msg;
+		}
 
-		const char* message() {
+		char* message() {
 			return _message;
 		}
 	};
