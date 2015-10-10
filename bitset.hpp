@@ -13,8 +13,8 @@ namespace mod3 {
 			_value = 0;
 		}
 
-		void set(int index, bit b) {
-			if(index < 0 || index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
+		void set(unsigned short index, bit b) {
+			if(index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
 			else {
 				if(b == ONE) {
 					_value |= (1 << index);
@@ -25,8 +25,8 @@ namespace mod3 {
 			}
 		}
 
-		bit get(int index) const {
-			if(index < 0 || index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
+		bit get(unsigned short index) const {
+			if(index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
 			else {
 				return (((1 << index) & _value) == 0) ? ZERO : ONE;
 			}
@@ -45,6 +45,9 @@ namespace mod3 {
 
 		BitSet(idx length) {
 			_data = new byte[(length / memory::bytelength) + 1];
+			for(idx i = 0; i < (length / memory::bytelength) + 1; i++) {
+				_data[i] = 0; //Initialize value to be 00000000 (or other based on computer)
+			}
 			_length = length;
 		}
 
@@ -61,7 +64,7 @@ namespace mod3 {
 					*(_data + (index / memory::bytelength)) |= (1 << (index % memory::bytelength));
 				}
 				else {
-					*(_data + (index / memory::bytelength)) &= ~(0 << (index % memory::bytelength));
+					*(_data + (index / memory::bytelength)) &= ~(1 << (index % memory::bytelength));
 				}
 
 			}
@@ -70,7 +73,7 @@ namespace mod3 {
 		bit get(idx index) const {
 			if(index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
 			else {
-				return (((1 << index) & *(_data + (index / memory::bytelength))) == 0) ? ZERO : ONE;
+				return (((1 << (index % memory::bytelength)) & *(_data + (index / memory::bytelength))) == 0) ? ZERO : ONE;
 			}
 		}
 	} BitSet;
