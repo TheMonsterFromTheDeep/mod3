@@ -2,8 +2,8 @@
 #define __INCL_MEMORY
 
 namespace mod3 {
-	typedef unsigned long idx; //Stores either a list length or index, ergo called "idx"
-	typedef unsigned char byte; //A simple "byte" is simply an unsigned char, which is essentially a one-byte unsigned integer in memory
+	typedef unsigned int numc; //Stores values used for containers
+	typedef unsigned char byte; //A raw value of the smallest allocatable size
 	
 	typedef enum bit: byte {
 		ZERO = 0,
@@ -33,16 +33,16 @@ namespace mod3 {
 		}
 
 		template<class T>
-		T* getNullifiedSet(idx size) {
+		T* getNullifiedSet(numc size) {
 			byte* tmp = new byte[sizeof(T) * size];
-			for(idx i = 0; i < sizeof(T) * size; i++) {
+			for(numc i = 0; i < sizeof(T) * size; i++) {
 				*(tmp + i) = 0;
 			}
 			return reinterpret_cast<T*>(tmp);
 		}
 
 		template<class T>
-		int typeSizeInBits() {
+		int sizeInBits() {
 			return sizeof(T) * bytelength;
 		}
 	}

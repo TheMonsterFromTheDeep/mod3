@@ -36,22 +36,22 @@ namespace mod3 {
 	typedef class BitSet {
 	private:
 		byte* _data; //Stores the data - the length of this pointer is equal to _length / 8 + 1
-		idx _length;
+		numc _length;
 	public:
 		BitSet() {
 			_length = 0;
 			_data = nullptr;
 		}
 
-		BitSet(idx length) {
+		BitSet(numc length) {
 			_data = new byte[(length / memory::bytelength) + 1];
-			for(idx i = 0; i < (length / memory::bytelength) + 1; i++) {
+			for(numc i = 0; i < (length / memory::bytelength) + 1; i++) {
 				_data[i] = 0; //Initialize value to be 00000000 (or other based on computer)
 			}
 			_length = length;
 		}
 
-		void set(idx index, bit b) {
+		void set(numc index, bit b) {
 			if(index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
 			else {
 				//This equation sets the bit at the right byte to the specified bit.
@@ -70,7 +70,7 @@ namespace mod3 {
 			}
 		}
 
-		bit get(idx index) const {
+		bit get(numc index) const {
 			if(index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
 			else {
 				return (((1 << (index % memory::bytelength)) & *(_data + (index / memory::bytelength))) == 0) ? ZERO : ONE;

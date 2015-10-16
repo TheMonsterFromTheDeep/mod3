@@ -1,8 +1,7 @@
 #ifndef __INCL_EXCEPTION
 #define __INCL_EXCEPTION
 
-namespace mod3
-{
+namespace mod3 {
 	class exception {
 	private:
 		char* _message;
@@ -18,5 +17,3 @@ namespace mod3
 };
 
 #endif
-
-//end of file
