@@ -21,7 +21,7 @@ namespace mod3 {
 			return length;
 		}
 
-		const unsigned short bytelength = calculateByteLength(); //Bytelength is a short because if the length of a byte is more than 65536, than that computer shouldn't be running this code
+		const unsigned short ByteLength = calculateByteLength(); //Bytelength is a short because if the length of a byte is more than 65536, than that computer shouldn't be running this code
 
 		template<class T>
 		T* getNullified() {

@@ -43,8 +43,7 @@ namespace mod3 {
 		void insert(numc index, const string& s);
 
 		void replace(char find, char replace) {
-			for(int i = 0; i < _length; i++)
-			{
+			for(numc i = 0; i < _length; i++) {
 				if(*(_text + i) == find) { *(_text + i) = replace; }
 			}
 		}
@@ -99,7 +98,7 @@ namespace mod3 {
 		}
 		if(copy) {		
 			_text = new char[_length + 1];
-			for(int i = 0; i < _length; i++) {
+			for(numc i = 0; i < _length; i++) {
 				*(_text + i) = *(value + i);
 			}
 			*(_text + _length) = '\0';
@@ -115,7 +114,7 @@ namespace mod3 {
 			_length++;
 		}
 		_text = new char[_length + 1];
-		for(int i = 0; i < _length; i++) {
+		for(numc i = 0; i < _length; i++) {
 			*(_text + i) = *(value + i);
 		}
 		*(_text + _length) = '\0'; //Add null terminator
@@ -141,7 +140,7 @@ namespace mod3 {
 	void string::concatenate(const char* c) {
 		numc c_length = 0;
 		while(*(c + c_length) != '\0') { c_length++; }
-		if(_length + c_length + 1 > _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
+		if(_length + c_length + 1 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
 		else {
 		char* tmp = _text;
 			_text = new char[_length + c_length + 1];
@@ -164,10 +163,10 @@ namespace mod3 {
 		else {
 			char* tmp = _text;
 			_text = new char[_length + s._length + 1];
-			for(int i = 0; i < _length; i++) {
+			for(numc i = 0; i < _length; i++) {
 				*(_text + i) = *(tmp + i);
 			}
-			for(int i = 0; i < s._length; i++) {
+			for(numc i = 0; i < s._length; i++) {
 				*(_text + _length + i) = *(s._text + i);
 			}
 			*(_text + _length + s._length) = '\0';
@@ -246,7 +245,7 @@ namespace mod3 {
 
 	bool string::equals(const string& s) const {
 		if(_length == s._length) {
-			for(int i = 0; i < _length; i++) {
+			for(numc i = 0; i < _length; i++) {
 				if(*(_text + i) != *(s._text + i)) { return false; }
 			}
 			return true;
@@ -258,7 +257,7 @@ namespace mod3 {
 		int c_length = 0;
 		while(*(c + c_length) != '\0') { c_length++; }
 		if(_length == c_length) {
-			for(int i = 0; i < _length; i++) {
+			for(numc i = 0; i < _length; i++) {
 				if(*(_text + i) != *(c + i)) { return false; }
 			}
 			return true;
@@ -278,7 +277,7 @@ namespace mod3 {
 	}
 
 	string string::operator+(const char* c) const {	
-		int c_length = 0;
+		numc c_length = 0;
 		while(*(c + c_length) != '\0') { c_length++; }
 
 		if(c_length + _length + 1 < _length + 1) { throw mod3::exception("Attempting to extend string past maximum string length"); }
@@ -286,7 +285,7 @@ namespace mod3 {
 			string tmp = copy();
 
 			tmp._length += c_length;
-			for(int i = 0; i < c_length; i++) {
+			for(numc i = 0; i < c_length; i++) {
 				*(tmp._text + _length + i) = *(c + i);
 			}
 			*(tmp._text + _length + c_length) = '\0';
@@ -300,7 +299,7 @@ namespace mod3 {
 		string tmp = copy();
 
 		tmp._length += s._length;
-		for(int i = 0; i < s._length; i++) {
+		for(numc i = 0; i < s._length; i++) {
 			*(tmp._text + _length + i) = *(s._text + i);
 		}
 		*(tmp._text + _length + s._length) = '\0';

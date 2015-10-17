@@ -14,7 +14,7 @@ namespace mod3 {
 		}
 
 		void set(unsigned short index, bit b) {
-			if(index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
+			if(index >= memory::ByteLength) { throw mod3::exception("Index out of bounds in BitString"); }
 			else {
 				if(b == ONE) {
 					_value |= (1 << index);
@@ -26,7 +26,7 @@ namespace mod3 {
 		}
 
 		bit get(unsigned short index) const {
-			if(index >= memory::bytelength) { throw mod3::exception("Index out of bounds in BitString"); }
+			if(index >= memory::ByteLength) { throw mod3::exception("Index out of bounds in BitString"); }
 			else {
 				return (((1 << index) & _value) == 0) ? ZERO : ONE;
 			}
@@ -44,8 +44,8 @@ namespace mod3 {
 		}
 
 		BitSet(numc length) {
-			_data = new byte[(length / memory::bytelength) + 1];
-			for(numc i = 0; i < (length / memory::bytelength) + 1; i++) {
+			_data = new byte[(length / memory::ByteLength) + 1];
+			for(numc i = 0; i < (length / memory::ByteLength) + 1; i++) {
 				_data[i] = 0; //Initialize value to be 00000000 (or other based on computer)
 			}
 			_length = length;
@@ -61,10 +61,10 @@ namespace mod3 {
 				//shifted by the index modulo 8. The index is modulo'd 8 so that it has
 				//the proper remained from the index passed to the method.
 				if(b == ONE) {
-					*(_data + (index / memory::bytelength)) |= (1 << (index % memory::bytelength));
+					*(_data + (index / memory::ByteLength)) |= (1 << (index % memory::ByteLength));
 				}
 				else {
-					*(_data + (index / memory::bytelength)) &= ~(1 << (index % memory::bytelength));
+					*(_data + (index / memory::ByteLength)) &= ~(1 << (index % memory::ByteLength));
 				}
 
 			}
@@ -73,7 +73,7 @@ namespace mod3 {
 		bit get(numc index) const {
 			if(index >= _length) { throw mod3::exception("Index out of bounds in BitSet"); }
 			else {
-				return (((1 << (index % memory::bytelength)) & *(_data + (index / memory::bytelength))) == 0) ? ZERO : ONE;
+				return (((1 << (index % memory::ByteLength)) & *(_data + (index / memory::ByteLength))) == 0) ? ZERO : ONE;
 			}
 		}
 	} BitSet;

@@ -101,8 +101,7 @@ namespace mod3 {
 
 			_elems = memory::getNullifiedSet<T>(_length + length);
 
-			for(numc i = 0; i < _length; i++)
-			{
+			for(numc i = 0; i < _length; i++) {
 				*(_elems + i) = *(tmp + i);
 			}
 
@@ -149,7 +148,7 @@ namespace mod3 {
 		else {
 			T* tmp = _elems;
 
-			_elems = memory::getNullifiedSet(_length - 1);
+			_elems = memory::getNullifiedSet<T>(_length - 1);
 
 			for(numc i = 0; i < index; i++) {
 				*(_elems + i) = *(tmp + i);
@@ -171,7 +170,7 @@ namespace mod3 {
 		else {
 			T* tmp = _elems;
 
-			_elems = memory::getNullifiedSet(_length - length);
+			_elems = memory::getNullifiedSet<T>(_length - length);
 
 			for(numc i = 0; i < index; i++) {
 				*(_elems + i) = *(tmp + i);
@@ -188,7 +187,7 @@ namespace mod3 {
 
 	template<class T>
 	list<T>::list(numc length) {
-		_elems = memory::getNullifiedSet(length);
+		_elems = memory::getNullifiedSet<T>(length);
 
 		_length = length;
 	}
