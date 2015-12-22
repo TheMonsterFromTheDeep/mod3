@@ -1,89 +1,171 @@
 #ifndef __INCL_LIST
 #define __INCL_LIST
 
-#include <new> //Used for bad_alloc errors
-#include "memory.hpp" //For getNullified() and c_size
-#include "exception.hpp"
+#include "base.hpp"
 
 namespace mod3 {
 	template <class T>
-	class list {
+	class List {
 	private:
-		T* _elems;
-		numc _length;
+		T* elems;
+		uint _length;
+
+		//Used by Builder class so that unnecessary copying doesn't happen
+		List(T* e, uint s) : elems(e), _length(s) { }
+
+		template<class B>
+		class Builder {
+		private:
+			B* elems;
+			uint length;
+			uint write;
+		public:
+			Builder(uint size) {
+				unsigned char* init = new unsigned char[size * sizeof(B)];
+				for(uint i = 0; i < size * sizeof(B); init[i++] = 0);
+				elems = reinterpret_cast<B*>(init);
+
+				length = size;
+				write = 0;
+			}
+
+			Builder<B>& operator()(B value) {
+				if(length + 1 < length) { throw Exception("Adding element to built List failed - new size is greater than maximum List size"); }
+				else {
+					if(write < length) {
+						elems[write] = value;
+					}
+					else {
+						B* tmp = elems;
+
+						elems = reinterpret_cast<T*>(new unsigned char[(length + 1) * sizeof(B)]);
+
+						for(uint i = 0; i < length; i++) { //length still has old value
+							elems[i] = tmp[i];
+						}
+
+						delete[] tmp;
+
+						elems[length] = value; //Set new value at largest index of new array
+
+						length++;
+					}
+					write++; //Write always needs to be incremented such that after the initial free space is exhausted, no other space is ever confused as free
+				}
+				return *this;
+			}
+
+			operator List<B>() {
+				return List<B>(elems,length);
+			}
+		};
 	public:	
-		list() {
-			_elems = nullptr;
-			_length = 0;
+		List() : elems(nullptr), _length(0) { }
+
+		List(uint length);
+		List(uint length, T value);
+		template<uint size>
+		List(T (&items)[size]);
+
+		static Builder<T> create(T first) { return Builder<T>(1)(first); }
+		template<uint size>
+		static Builder<T> create(T first) { return Builder<T>(size)(first); }
+
+		//Returns a const reference because this is not supposed to be modifiable
+		const T& get(uint index) const {
+			if(index >= _length) { throw Exception("List get failed - index out of bounds"); }
+			else { return elems[index]; }
+		}
+		  
+		//If a List is const, values should not be modifiable
+		const T& operator[] (uint index) const {
+			if(index >= _length) { throw Exception("List element access failed - index out of bounds"); }
+			else { return elems[index]; }
 		}
 
-		list(numc length);
-		list(numc length, T value);
-
-		T get(numc index) const {
-			if(index >= _length) { throw exception("Index out of bounds in list"); }
-			else { return *(_elems + index); }
-		}
-
-		T& operator[] (numc index) { //Returns a reference so value can be modified 
-			if(index >= _length) { throw exception("Index out of bounds in list"); }
-			else { return *(_elems + index); }
+		T& operator[] (uint index) { //Returns a reference so value can be modified 
+			if(index >= _length) { throw Exception("List element access failed - index out of bounds"); }
+			else { return elems[index]; }
 		}
 
 		void add(T value);
-		void insert(numc index, T value);
+		void insert(uint index, T value);
 
-		void expand(numc length);
-		void bubble(numc index, numc length);
+		void expand(uint length);
+		void bubble(uint index, uint length);
 
-		void reset(numc index);
-		void remove(numc index);
-		void remove(numc index, numc length);
+		void reset(uint index);
+		void reset(uint index, uint length);
+		void remove(uint index);
+		void remove(uint index, uint length);
 
-		void set(numc index, T value) {
-			if(index >= _length) { throw exception("Index out of bounds in list"); }
-			else { *(_elems + index) = value; }
+		void set(uint index, const T& value) {
+			if(index >= _length) { throw Exception("List set failed - index out of bounds"); }
+			else { elems[index] = value; }
 		}
 
-		int length() const { return _length; }
+		uint length() const { return _length; }
 	};
+	
+	template<class T>
+	List<T>::List(uint length) : _length(length) {
+		unsigned char* init = new unsigned char[length * sizeof(T)];
+		for(uint i = 0; i < length * sizeof(T); init[i++] = 0);
+		elems = reinterpret_cast<T*>(init);
+	}
 
 	template<class T>
-	void list<T>::add(T value) {
+	List<T>::List(uint length, T value) : _length(length) {
+		elems = reinterpret_cast<T*>(new unsigned char[length * sizeof(T)]);
+		for(uint i = 0; i < length; i++) { elems[i] = value; } //Populate list with value
+	}
+
+	template<class T>
+	template<uint size>
+	List<T>::List(T (&items)[size]) {
+		elems = new T[size];
+		for(uint i = 0; i < size; i++) {
+			elems[i] = items[i];
+		}
+		_length = size;
+	}
+
+	template<class T>
+	void List<T>::add(T value) {
 		//If the length plus one is less than the length, it must have rolled over to 0 and thus problems will happen. Prevent problems by throwing an exception.
-		if(_length + 1 < _length) { throw mod3::exception("Attempting to extend list past maximum list length"); }
+		if(_length + 1 < _length) { throw Exception("List add failed - new size is greater than maximum List size"); }
 		else {
-			T* tmp = _elems;
+			T* tmp = elems;
 
-			_elems = memory::getNullifiedSet<T>(_length + 1);
+			elems = reinterpret_cast<T*>(new unsigned char[(_length + 1) * sizeof(T)]);
 
-			for(numc i = 0; i < _length; i++) { //length still has old value
-				*(_elems + i) = *(tmp + i);
+			for(uint i = 0; i < _length; i++) { //length still has old value
+				elems[i] = tmp[i];
 			}
 
 			delete[] tmp;
 
-			*(_elems + _length) = value; //Set new value at largest index of new array
+			elems[_length] = value; //Set new value at largest index of new array
 
 			_length++;
 		}
 	}
 
 	template<class T>
-	void list<T>::insert(numc index, T value) {
-		if(index >= _length) { throw exception("Index out of bounds in list"); }
-		else if(_length + 1 < _length) { throw mod3::exception("Attempting to extend list past maximum list length"); }
+	void List<T>::insert(uint index, T value) {
+		if(index >= _length) { throw Exception("List insert failed - index out of bounds"); }
+		else if(_length + 1 < _length) { throw Exception("List insert failed - new size is greater than maximum List size"); }
 		else {
-			T* tmp = _elems;
+			T* tmp = elems;
 
-			_elems = memory::getNullifiedSet<T>(_length + 1);
+			elems = reinterpret_cast<T*>(new unsigned char[(_length + 1) * sizeof(T)]);
 
-			for(numc i = 0; i < index; i++) { //If index = 0 inserted element should be first
-				*(_elems + i) = *(tmp + i);
+			for(uint i = 0; i < index; i++) { //If index = 0 inserted element should be first
+				elems[i] = tmp[i];
 			}
-			*(_elems + index) = value; //Insert the new value at the index
-			for(numc i = index + 1; i < _length + 1; i++) {
-				*(_elems + i) = *(tmp + i - 1);
+			*(elems + index) = value; //Insert the new value at the index
+			for(uint i = index + 1; i < _length + 1; i++) {
+				elems[i] = tmp[i - 1];
 			}
 
 			delete[] tmp;
@@ -93,16 +175,18 @@ namespace mod3 {
 	}
 
 	template<class T>
-	void list<T>::expand(numc length) {
-		//If the length plus the new length is less than the old length, it must rollover and thus expanding list would cause problems.
-		if(_length + length < _length) { throw mod3::exception("Attempting to extend list past maximum list length"); }
+	void List<T>::expand(uint length) {
+		if(_length + length < _length) { throw Exception("List expand failed - new size is greater than maximum List size"); } //If the length plus the new length is less than the old length, it must rollover and thus expanding list would cause problems.
+		else if(length == 0) { } //TODO: Do this prettier
 		else {
-			T* tmp = _elems;
+			T* tmp = elems;
 
-			_elems = memory::getNullifiedSet<T>(_length + length);
+			unsigned char* init = new unsigned char[(_length + length) * sizeof(T)];
+			for(uint i = _length * sizeof(T); i < (_length + length) * sizeof(T); init[i++] = 0);
+			elems = reinterpret_cast<T*>(init);
 
-			for(numc i = 0; i < _length; i++) {
-				*(_elems + i) = *(tmp + i);
+			for(uint i = 0; i < _length; i++) {
+				elems[i] = tmp[i];
 			}
 
 			delete[] tmp;
@@ -112,20 +196,22 @@ namespace mod3 {
 	}
 
 	template<class T>
-	void list<T>::bubble(numc index, numc length) {
-		if(index >= _length) { throw exception("Index out of bounds in list"); }
-		else if(length < 1) { throw exception("Invalid length parameter"); }
-		else if(_length + length < _length) { throw mod3::exception("Attempting to extend list past maximum list length"); }
+	void List<T>::bubble(uint index, uint length) {
+		if(index >= _length) { throw Exception("List bubble failed - out of bounds"); }
+		else if(_length + length < _length) { throw Exception("List bubble failed - new size is greater than maximum List size"); }
+		else if(length == 0) { }
 		else {
-			T* tmp = _elems;
+			T* tmp = elems;
 
-			_elems = memory::getNullifiedSet<T>(_length + length);
+			unsigned char* init = new unsigned char[(_length + length) * sizeof(T)];
+			for(uint i = index * sizeof(T); i < (index + length) * sizeof(T); init[i++] = 0);
+			elems = reinterpret_cast<T*>(init);
 
-			for(numc i = 0; i < index; i++) {
-				*(_elems + i) = *(tmp + i);
+			for(uint i = 0; i < index; i++) {
+				elems[i] = tmp[i];
 			}
-			for(numc i = index + length; i < _length + length; i++) {
-				*(_elems + i) = *(tmp + i - length);
+			for(uint i = index + length; i < _length + length; i++) {
+				elems[i] = tmp[i - length];
 			}
 
 			delete[] tmp;
@@ -135,26 +221,41 @@ namespace mod3 {
 	}
 
 	template<class T>
-	void list<T>::reset(numc index) {
-		if(index >= _length) { throw exception("Index out of bounds in list"); }
+	void List<T>::reset(uint index) {
+		if(index >= _length) { throw Exception("List reset failed - index out of bounds"); }
 		else {
-			*(_elems + index) = *memory::getNullified<T>();
+			unsigned char* value = new unsigned char[sizeof(T)];
+			for(uint i = 0; i < sizeof(T); i++) { value[i] = 0; }
+			elems[index] = *reinterpret_cast<T*>(value);
 		}
 	}
 
 	template<class T>
-	void list<T>::remove(numc index) {
-		if(index >= _length) { throw exception("Index out of bounds in list"); }
+	void List<T>::reset(uint index, uint length) {
+		if(index + length >= _length) { throw Exception("List reset failed - out of bounds"); }
+		else if(length == 0) { }
 		else {
-			T* tmp = _elems;
+			unsigned char* value = new unsigned char[sizeof(T)];
+			for(uint i = 0; i < sizeof(T); i++) { value[i] = 0; }
+			for(uint i = 0; i < length; i++) {
+				elems[i + index] = *reinterpret_cast<T*>(value);
+			}		
+		}
+	}
 
-			_elems = memory::getNullifiedSet<T>(_length - 1);
+	template<class T>
+	void List<T>::remove(uint index) {
+		if(index >= _length) { throw Exception("List remove failed - index out of bounds"); }
+		else {
+			T* tmp = elems;
 
-			for(numc i = 0; i < index; i++) {
-				*(_elems + i) = *(tmp + i);
+			elems = reinterpret_cast<T*>(new unsigned char[(_length - 1) * sizeof(T)]);
+
+			for(uint i = 0; i < index; i++) {
+				elems[i] = tmp[i];
 			}
-			for(numc i = index + 1; i < _length; i++) {
-				*(_elems + i - 1) = *(tmp + i);
+			for(uint i = index + 1; i < _length; i++) {
+				elems[i - 1] = tmp[i];
 			}
 
 			delete[] tmp;
@@ -164,41 +265,25 @@ namespace mod3 {
 	}
 
 	template<class T>
-	void list<T>::remove(numc index, numc length) {
-		if(index >= _length) { throw exception("Index out of bounds in list"); }
-		else if(length < 1 || length > _length) { throw exception("Invalid length parameter"); }
+	void List<T>::remove(uint index, uint length) {
+		if(index + length >= _length) { throw Exception("List remove failed - out of bounds"); }
+		else if(length == 0) { }
 		else {
-			T* tmp = _elems;
+			T* tmp = elems;
 
-			_elems = memory::getNullifiedSet<T>(_length - length);
+			elems = reinterpret_cast<T*>(new unsigned char[(_length - length) * sizeof(T)]);
 
-			for(numc i = 0; i < index; i++) {
-				*(_elems + i) = *(tmp + i);
+			for(uint i = 0; i < index; i++) {
+				elems[i] = tmp[i];
 			}
-			for(numc i = index + length; i < _length; i++) {
-				*(_elems + i - length) = *(tmp + i);
+			for(uint i = index + length; i < _length; i++) {
+				elems[i - length] = tmp[i];
 			}
 
 			delete[] tmp;
 
 			_length -= length;
 		}
-	}
-
-	template<class T>
-	list<T>::list(numc length) {
-		_elems = memory::getNullifiedSet<T>(length);
-
-		_length = length;
-	}
-
-	template<class T>
-	list<T>::list(numc length, T value) {
-		_elems = memory::getNullifiedSet<T>(length);
-
-		for(numc i = 0; i < length; i++) { *(_elems + i) = value; } //Populate list with value
-
-		_length = length;
 	}
 }
 

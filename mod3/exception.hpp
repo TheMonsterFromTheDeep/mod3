@@ -2,17 +2,11 @@
 #define __INCL_EXCEPTION
 
 namespace mod3 {
-	class exception {
-	private:
-		char* _message;
+	class Exception {
 	public:
-		exception(char* msg) { 
-			_message = msg;
-		}
+		char* message;
 
-		char* message() {
-			return _message;
-		}
+		Exception(char* msg) : message(msg) { }
 	};
 };
 
