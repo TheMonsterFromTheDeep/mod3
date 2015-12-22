@@ -1,18 +1,18 @@
 #mod3
-mod3 is the name for a one-man project to build a cross-platform C++ library with lots of functionality. Right now mod3 contains two data structures but much more should come sometime in the future.
-###goals
-The main goal of mod3 is to build a comprehensive C++ library that makes it simple to compile code compatible with multiple operating systems. It is meant to support as wide of a range of functions as possible, which in the future will include the types of files it will be able to load and the types of applications it will be able to create.
-###functionality
-Right now mod3 has only a few classes that do very little.
-#####string
-The string class contains data for a string. It can be constructed from a char\* or a const char\*, or just a single char. When being constructed from a const char\*, the data must be copied over. The string class has a few methods used to manipulate it. These include the at(index) method, which returns the character at the specified index, and the set(value,index) method which sets the value at the specified index. Strings can also be concatenated with other strings or char*s with the concatenate() method or the + or += operators. Sadly, the order of operands in string functions is not yet consistent with those in lists.
-#####list
-The list<T> class contains a list of elements of type T. The list class includes methods for manipulating these elements, including the get() method and set() method. The list class also has the operator [], which returns a reference to the value at the index specified, allowing modification of values such as `myIntList[0] = 23`. The list class also has a template specialization list<void>, which does not have the [] operator but does cast all elements retrieved to the type specified.
-#####exception
-A general exception class thrown by other mod3 classes when they encounter a strange scenario. The exception class has the accessor message() which returns a const char\* containing the message text of the exception thrown.
-###format
-mod3 is meant to be a consistent format but isn't quite formatted consistently as of the current version. The order of operands in the string class is (value, index) while in the list class it is (index, value).
+mod3 is, at its most basic level, a C++ library. However, it is not very similar to other C++ libraries. The leading design goal behind mod3 is consistency. This means that mod3 is built on the philosophy that as little non-consistent code should be used as possible.
 
-All mod3 classes are located in the mod3 namespace.
-###misc
-In the future detailed documentation about mod3 as well as essentially an instruction manual should be available [here](http://themonsterfromthedeep.github.io/mod3/).
+This, of course, means that mod3 reimplements a large portion of the standard library.
+
+That is why mod3, originally simply a name, now stands for Multiple Orders of Destruction - as mod3 in no way is meant to be stable or something that should ever be used.
+
+Rather, mod3 is simply a hacked together tool for hacked together projects. Legitimate uses of mod3 include Ludum Dare and other informal situations.
+
+However, in almost no situation is mod3 the best choice - as it is essentially an experiment by a teenager to build a gigantic programmatic toolbox. This means there is no guarantee that anything in mod3 will not set your computer on fire.
+
+(use at your own risk)
+
+### functionality
+In its current state, mod3 provides approximately two half-baked container classes - List<type> and String. It also implements its own Exception class because - consistency.
+
+### documentation
+Documentation for mod3 should hopefully be built someday. If it is, it will be available [here](http://themonsterfromthedeep.github.io/mod3/).
